@@ -40,14 +40,26 @@ const getAllRooms = async (req, res) => {
 };
 
 // Get room by ID
+// Get room by ID with booked dates
 const getRoomById = async (req, res) => {
     const { id } = req.params;
 
     try {
+        // Fetch the room details
         const room = await Room.findById(id);
         if (!room) return res.status(404).json({ message: "Room not found" });
 
-        res.status(200).json(room);
+        // Fetch bookings for the specific room
+        const bookings = await Booking.find({ roomId: id }); // Assuming roomId is the field in Booking model
+
+        // Extract booked dates from bookings
+        const bookedDates = bookings.flatMap(booking => booking.bookedDates.map(date => date.toISOString().split('T')[0])); // Convert Date objects to 'yyyy-mm-dd' format
+
+        // Send both room details and booked dates
+        res.status(200).json({
+            room,
+            bookedDates, // Return booked dates as an array
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
