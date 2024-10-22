@@ -69,6 +69,7 @@ const getRoomById = async (req, res) => {
 const updateRoom = async (req, res) => {
     const { id } = req.params;
     const { title, rent, facilities } = req.body;
+    console.log(facilities)
 
     try {
         const picture = req.file ? req.file.path : null; // Optional photo update
