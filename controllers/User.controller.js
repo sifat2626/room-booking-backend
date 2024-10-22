@@ -7,32 +7,30 @@ const registerUser = async (req, res) => {
     const { name, email, password } = req.body;
 
     try {
-        // Check if the user already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({ message: "Email already exists" });
         }
 
-        // Create a new user
         const newUser = new User({ name, email, password });
         await newUser.save();
 
-        // Generate a JWT token including email
         const token = jwt.sign(
-            { id: newUser._id, role: newUser.role, email: newUser.email,name:newUser.name },
+            { id: newUser._id, role: newUser.role, email: newUser.email, name: newUser.name },
             process.env.JWT_SECRET,
             { expiresIn: "1d" }
         );
 
-        // Set the token as an HTTP-only cookie
+        // Log before setting the cookie
+        console.log("Setting cookie:", token);
+
         res.cookie("access_token", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
+            secure: process.env.NODE_ENV === "production", // Adjust for local testing
             sameSite: "None",
             maxAge: 24 * 60 * 60 * 1000,
         });
 
-        // Respond with success message and user details (excluding password)
         res.status(201).json({
             message: "User registered successfully",
             user: {
@@ -44,6 +42,7 @@ const registerUser = async (req, res) => {
             access_token: token,
         });
     } catch (error) {
+        console.error("Registration error:", error);
         res.status(400).json({ error: error.message });
     }
 };

@@ -4,7 +4,7 @@ const Room = require("../models/Room.model");
 const Booking = require("../models/Booking.model");
 
 const multer = require('multer');
-const {storage} = require("../config/cloudinary");
+const { storage } = require("../config/cloudinary");
 const upload = multer({ storage });
 
 // Create a new room with photo upload
@@ -13,7 +13,11 @@ const createRoom = async (req, res) => {
 
     try {
         const picture = req.file ? req.file.path : null; // Get the Cloudinary URL for the uploaded picture
-        const newRoom = new Room({ title, rent, facilities, picture });
+
+        // Convert facilities from a comma-separated string to an array
+        const facilitiesArray = facilities ? facilities.split(',').map(facility => facility.trim()) : [];
+
+        const newRoom = new Room({ title, rent, facilities: facilitiesArray, picture });
 
         await newRoom.save();
         res.status(201).json({
@@ -24,7 +28,6 @@ const createRoom = async (req, res) => {
         res.status(400).json({ error: error.message });
     }
 };
-
 
 // Get all rooms
 const getAllRooms = async (req, res) => {
@@ -57,9 +60,13 @@ const updateRoom = async (req, res) => {
 
     try {
         const picture = req.file ? req.file.path : null; // Optional photo update
+
+        // Convert facilities from a comma-separated string to an array
+        const facilitiesArray = facilities ? facilities.split(',').map(facility => facility.trim()) : [];
+
         const updatedRoom = await Room.findByIdAndUpdate(
             id,
-            { title, rent, facilities, ...(picture && { picture }) },
+            { title, rent, facilities: facilitiesArray, ...(picture && { picture }) },
             { new: true }
         );
 
@@ -122,4 +129,4 @@ const checkAvailability = async (req, res) => {
     }
 };
 
-module.exports = { createRoom, getAllRooms, getRoomById, updateRoom, deleteRoom, checkAvailability,upload };
+module.exports = { createRoom, getAllRooms, getRoomById, updateRoom, deleteRoom, checkAvailability, upload };
