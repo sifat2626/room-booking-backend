@@ -13,7 +13,7 @@ const Booking = require("../models/Booking.model"); // Ensure you have this midd
 const router = express.Router();
 
 // Create a new booking (protected route)
-router.post("/", authenticateJWT,authorizeRole(['admin']), createBooking);
+router.post("/", authenticateJWT, createBooking);
 
 // Update a booking (protected route)
 router.put("/:bookingId", authenticateJWT,authorizeRole(['admin']), updateBooking); // New route for updating bookings
