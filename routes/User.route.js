@@ -1,14 +1,12 @@
-// user.routes.js
-
 const express = require("express");
 const {
     registerUser,
     loginUser,
     getUserDetails,
     updateUserDetails,
-    resetPassword
+    logoutUser,
 } = require("../controllers/User.controller");
-const { authenticateJWT } = require("../middlewares/auth.middleware"); // Ensure you have this middleware
+const { authenticateJWT } = require("../middlewares/Auth.middleware");
 
 const router = express.Router();
 
@@ -23,5 +21,8 @@ router.get("/me", authenticateJWT, getUserDetails);
 
 // Update user details route (protected)
 router.put("/me", authenticateJWT, updateUserDetails);
+
+// User logout route (protected)
+router.post("/logout", authenticateJWT, logoutUser);
 
 module.exports = router;

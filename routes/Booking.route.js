@@ -3,21 +3,26 @@
 const express = require("express");
 const {
     createBooking,
+    updateBooking,
     getBookingHistory,
-    cancelBooking
+    cancelBooking,
 } = require("../controllers/Booking.controller");
-const { authenticateJWT, authorizeRole } = require("../middlewares/auth.middleware"); // Ensure you have this middleware
+const { authenticateJWT, authorizeRole } = require("../middlewares/Auth.middleware");
+const Booking = require("../models/Booking.model"); // Ensure you have this middleware
 
 const router = express.Router();
 
 // Create a new booking (protected route)
-router.post("/", authenticateJWT, createBooking);
+router.post("/", authenticateJWT,authorizeRole(['admin']), createBooking);
+
+// Update a booking (protected route)
+router.put("/:bookingId", authenticateJWT,authorizeRole(['admin']), updateBooking); // New route for updating bookings
 
 // Get booking history for a user (protected route)
 router.get("/history", authenticateJWT, getBookingHistory);
 
 // Cancel a booking (protected route)
-router.delete("/:bookingId", authenticateJWT, cancelBooking);
+router.delete("/:bookingId", authenticateJWT,authorizeRole(['admin']), cancelBooking);
 
 // Admin route to get all bookings (protected route, admin only)
 router.get("/", authenticateJWT, authorizeRole(['admin']), async (req, res) => {

@@ -3,21 +3,28 @@
 const Room = require("../models/Room.model");
 const Booking = require("../models/Booking.model");
 
-// Create a new room
+const multer = require('multer');
+const {storage} = require("../config/cloudinary");
+const upload = multer({ storage });
+
+// Create a new room with photo upload
 const createRoom = async (req, res) => {
-    const { title, rent, facilities, picture } = req.body;
+    const { title, rent, facilities } = req.body;
 
     try {
+        const picture = req.file ? req.file.path : null; // Get the Cloudinary URL for the uploaded picture
         const newRoom = new Room({ title, rent, facilities, picture });
+
         await newRoom.save();
         res.status(201).json({
-            message: "Room created successfully",
+            message: 'Room created successfully',
             room: newRoom,
         });
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
 };
+
 
 // Get all rooms
 const getAllRooms = async (req, res) => {
@@ -46,16 +53,17 @@ const getRoomById = async (req, res) => {
 // Update a room
 const updateRoom = async (req, res) => {
     const { id } = req.params;
-    const { title, rent, facilities, picture } = req.body;
+    const { title, rent, facilities } = req.body;
 
     try {
+        const picture = req.file ? req.file.path : null; // Optional photo update
         const updatedRoom = await Room.findByIdAndUpdate(
             id,
-            { title, rent, facilities, picture },
+            { title, rent, facilities, ...(picture && { picture }) },
             { new: true }
         );
 
-        if (!updatedRoom) return res.status(404).json({ message: "Room not found" });
+        if (!updatedRoom) return res.status(404).json({ message: 'Room not found' });
 
         res.status(200).json(updatedRoom);
     } catch (error) {
@@ -114,4 +122,4 @@ const checkAvailability = async (req, res) => {
     }
 };
 
-module.exports = { createRoom, getAllRooms, getRoomById, updateRoom, deleteRoom, checkAvailability };
+module.exports = { createRoom, getAllRooms, getRoomById, updateRoom, deleteRoom, checkAvailability,upload };

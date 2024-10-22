@@ -16,12 +16,13 @@ const app = express();
 
 // Middleware
 app.use(cors({
-    origin: ["http://localhost:5173"], // Adjust based on your front-end URL
+    origin: ["http://localhost:3000",'https://room-booking-frontend-q5jv.vercel.app'], // Adjust based on your front-end URL
     credentials: true,
 }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan('dev'))
+
 
 // Mount routes with prefixes
 app.use("/api/v1/rooms", roomRoutes); // Mount room routes under /room

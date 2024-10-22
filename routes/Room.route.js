@@ -1,34 +1,13 @@
-// room.routes.js
-
-const express = require("express");
-const {
-    createRoom,
-    getAllRooms,
-    getRoomById,
-    updateRoom,
-    deleteRoom,
-    checkAvailability
-} = require("../controllers/Room.controller");
-const { authenticateJWT, authorizeRole } = require("../middlewares/auth.middleware"); // Ensure you have this middleware
-
+// routes/Room.route.js
+const express = require('express');
+const { createRoom, getAllRooms, getRoomById, updateRoom, deleteRoom, checkAvailability, upload } = require('../controllers/Room.controller');
 const router = express.Router();
 
-// Create a new room (protected route, admin only)
-router.post("/", authenticateJWT, authorizeRole(['admin']), createRoom);
-
-// Get all rooms
-router.get("/", getAllRooms); // Public route
-
-// Get room by ID
-router.get("/:id", getRoomById); // Public route
-
-// Update a room (protected route, admin only)
-router.put("/:id", authenticateJWT, authorizeRole(['admin']), updateRoom);
-
-// Delete a room (protected route, admin only)
-router.delete("/:id", authenticateJWT, authorizeRole(['admin']), deleteRoom);
-
-// Check availability of a room (public route)
-router.post("/check-availability", checkAvailability);
+router.post('/', upload.single('picture'), createRoom); // Use multer for single file upload (picture)
+router.put('/:id', upload.single('picture'), updateRoom); // Optional update of room picture
+router.get('/', getAllRooms);
+router.get('/:id', getRoomById);
+router.delete('/:id', deleteRoom);
+router.post('/availability', checkAvailability);
 
 module.exports = router;

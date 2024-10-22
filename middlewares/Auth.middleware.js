@@ -5,7 +5,9 @@ const cookieParser = require("cookie-parser");
 
 // Middleware to check if the user is authenticated
 const authenticateJWT = (req, res, next) => {
+
     const token = req.cookies.access_token; // Get token from cookies
+    console.log(req.cookies)
     if (!token) {
         return res.sendStatus(403); // Forbidden if no token is found
     }
